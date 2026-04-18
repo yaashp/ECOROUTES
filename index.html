@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Food Miles — Track Your Plate's Carbon Journey</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Share+Tech+Mono&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a class="nav-logo" href="#">
+    <div class="nav-logo-icon">🌱</div>
+    <span class="nav-logo-text">FoodMiles</span>
+  </a>
+  <div class="nav-links">
+    <a class="nav-link" href="#calculator">Calculator</a>
+    <a class="nav-link" href="#about">About</a>
+    <span class="nav-badge">Beta</span>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-inner">
+    <div>
+      <div class="hero-label">🌍 Carbon footprint tracker</div>
+      <h1 class="hero-title">Know where your<br><em>food travels</em><br>to reach you.</h1>
+      <p class="hero-subtitle">Every ingredient on your plate has journeyed thousands of kilometres. Track the real environmental cost — from farm to fork.</p>
+      <div class="hero-stats">
+        <div>
+          <span class="hero-stat-val">33+</span>
+          <span class="hero-stat-label">Foods tracked</span>
+        </div>
+        <div>
+          <span class="hero-stat-val">4</span>
+          <span class="hero-stat-label">Transport modes</span>
+        </div>
+        <div>
+          <span class="hero-stat-val">500+</span>
+          <span class="hero-stat-label">Cities supported</span>
+        </div>
+      </div>
+    </div>
+    <div class="hero-visual">
+      <div class="hero-card">
+        <div class="hero-card-icon" style="background:rgba(255,0,170,0.12)">✈️</div>
+        <div class="hero-card-text">
+          <div class="hero-card-name">Avocado from Mexico</div>
+          <div class="hero-card-detail">Air freight · 13,500 km to Mumbai</div>
+        </div>
+        <div class="hero-card-co2" style="color:#ff00aa;text-shadow:0 0 12px rgba(255,0,170,0.5)">8.12 kg CO₂</div>
+      </div>
+      <div class="hero-card">
+        <div class="hero-card-icon" style="background:rgba(0,245,255,0.1)">🚢</div>
+        <div class="hero-card-text">
+          <div class="hero-card-name">Coffee from Brazil</div>
+          <div class="hero-card-detail">Sea freight · 11,200 km to Mumbai</div>
+        </div>
+        <div class="hero-card-co2" style="color:#00ff88;text-shadow:0 0 12px rgba(0,255,136,0.5)">0.90 kg CO₂</div>
+      </div>
+      <div class="hero-card">
+        <div class="hero-card-icon" style="background:rgba(74,124,89,0.15)">🚛</div>
+        <div class="hero-card-text">
+          <div class="hero-card-name">Rice from India</div>
+          <div class="hero-card-detail">Road · 580 km to Mumbai</div>
+        </div>
+        <div class="hero-card-co2" style="color:#7fb89a">0.06 kg CO₂</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CALCULATOR -->
+<section class="app-section" id="calculator">
+  <div class="app-inner">
+    <div class="section-header">
+      <div>
+        <h2 class="section-title">Your Meal Calculator</h2>
+        <p class="section-sub">Add ingredients, choose your city, see the impact</p>
+      </div>
+    </div>
+
+    <div class="app-layout">
+      <!-- SIDEBAR -->
+      <div class="sidebar">
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">
+              <span class="card-title-icon">📍</span>
+              Your destination
+            </span>
+          </div>
+          <div class="card-body">
+            <div class="search-wrap">
+              <input class="search-input" id="cityInput" type="text" placeholder="Search for a city..." autocomplete="off">
+              <span class="search-icon">🔍</span>
+              <div class="search-dropdown" id="cityDropdown"></div>
+            </div>
+            <div class="selected-dest" id="selectedDest">
+              <div class="dest-pin">📍</div>
+              <div>
+                <div class="dest-name" id="destName">Mumbai, India</div>
+                <div class="dest-coords" id="destCoords">19.076°N, 72.877°E</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">
+              <span class="card-title-icon">🥗</span>
+              Ingredients
+            </span>
+            <span style="font-size:12px;color:var(--text-muted)" id="ingCount">0 items</span>
+          </div>
+          <div class="card-body" style="padding-bottom:16px">
+            <div class="ing-list" id="ingList"></div>
+            <button class="add-ing-btn" onclick="addIngredient()" style="margin-top:10px">
+              <span style="font-size:18px;line-height:1">+</span> Add ingredient
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT COLUMN -->
+      <div class="right-col">
+        <div class="summary-grid">
+          <div class="summary-card sc-distance">
+            <span class="sc-icon">🛣️</span>
+            <div class="sc-val" id="totDist">0</div>
+            <div class="sc-unit">kilometres</div>
+            <div class="sc-label">Total distance</div>
+          </div>
+          <div class="summary-card sc-co2">
+            <span class="sc-icon">💨</span>
+            <div class="sc-val" id="totCO2">0.00</div>
+            <div class="sc-unit">kg CO₂ equivalent</div>
+            <div class="sc-label">Carbon emissions</div>
+          </div>
+          <div class="summary-card sc-count">
+            <span class="sc-icon">🌾</span>
+            <div class="sc-val" id="totIng">0</div>
+            <div class="sc-unit">ingredients tracked</div>
+            <div class="sc-label">Meal composition</div>
+          </div>
+        </div>
+
+        <div class="map-card">
+          <div class="map-header">
+            <span class="map-title">🗺️ Transportation routes</span>
+            <div class="map-legend">
+              <div class="legend-item"><div class="legend-line" style="background:#ff00aa;box-shadow:0 0 6px #ff00aa;border-top:2px dashed #ff00aa;height:2px"></div>Air</div>
+              <div class="legend-item"><div class="legend-line" style="background:#00f5ff;box-shadow:0 0 6px #00f5ff"></div>Sea</div>
+              <div class="legend-item"><div class="legend-line" style="background:#00ff88;box-shadow:0 0 6px #00ff88"></div>Road</div>
+              <div class="legend-item"><div class="legend-line" style="background:#bf00ff;box-shadow:0 0 6px #bf00ff"></div>Rail</div>
+            </div>
+          </div>
+          <div id="map"></div>
+        </div>
+
+        <div class="impact-card">
+          <div class="impact-title">
+            Carbon impact meter
+            <span class="impact-val" id="impactLabel">0.00 kg CO₂</span>
+          </div>
+          <div class="impact-track">
+            <div class="impact-fill" id="impactFill" style="width:0%;background:var(--sage)"></div>
+          </div>
+          <div class="impact-scale">
+            <span>🌿 Low</span>
+            <span>⚡ Moderate</span>
+            <span>🔥 High</span>
+          </div>
+          <div class="breakdown-title">CO₂ by transport mode</div>
+          <div class="breakdown-bars" id="breakdownBars">
+            <div style="font-size:13px;color:var(--text-muted);text-align:center;padding:12px">Add ingredients to see breakdown</div>
+          </div>
+        </div>
+
+        <div class="alt-card" id="altCard" style="display:none">
+          <div class="alt-header">Greener alternatives</div>
+          <div class="alt-sub">Swap these air-freighted items for local options and dramatically cut your carbon footprint.</div>
+          <div class="alt-list" id="altList"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer id="about">
+  <div class="footer-logo">FoodMiles</div>
+  <p class="footer-text">CO₂ factors sourced from DEFRA &amp; industry transport emissions data. Distances calculated using the Haversine formula.<br>Built to help consumers make more sustainable food choices.</p>
+</footer>
+
+<script src="app.js"></script>
+</body>
+</html>
