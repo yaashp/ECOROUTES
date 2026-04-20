@@ -106,7 +106,7 @@ FoodMilesCalculator/
 
 ## 🌐 Live Demo
 
-👉 https://your-username.github.io/FOODMILESCALCULATOR/
+👉 https://yaashp.github.io/FOODMILESCALCULATOR/
 
 ---
 
