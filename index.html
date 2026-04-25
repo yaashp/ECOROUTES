@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Food Miles — Track Your Plate's Carbon Journey</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Share+Tech+Mono&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a class="nav-logo" href="#">
+    <div class="logo">
+    <img src="logo.png" class="logo-img">
+    <span class="logo-text">EcoRoute</span>
+    </div>
+  </a>
+  <div class="nav-links">
+    <a class="nav-link" href="#calculator">Calculator</a>
+    <a class="nav-link" href="#faq">FAQ</a>
+    <a class="nav-link" href="#about">About</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-inner">
+    <div>
+      <div class="hero-label">🌍 Carbon footprint tracker</div>
+      <h1 class="hero-title">Know where your<br><em>food travels</em><br>to reach you.</h1>
+      <p class="hero-subtitle">Every ingredient on your plate has journeyed thousands of kilometres. Track the real environmental cost — from farm to fork.</p>
+      <div class="hero-stats">
+        <div>
+          <span class="hero-stat-val">33+</span>
+          <span class="hero-stat-label">Foods tracked</span>
+        </div>
+        <div>
+          <span class="hero-stat-val">4</span>
+          <span class="hero-stat-label">Transport modes</span>
+        </div>
+        <div>
+          <span class="hero-stat-val">500+</span>
+          <span class="hero-stat-label">Cities supported</span>
+        </div>
+      </div>
+    </div>
+    <div class="hero-visual">
+      <div class="hero-card">
+        <div class="hero-card-icon" style="background:rgba(255,0,170,0.12)">✈️</div>
+        <div class="hero-card-text">
+          <div class="hero-card-name">Avocado from Mexico</div>
+          <div class="hero-card-detail">Air freight · 13,500 km to Mumbai</div>
+        </div>
+        <div class="hero-card-co2" style="color:#ff00aa;text-shadow:0 0 12px rgba(255,0,170,0.5)">8.12 kg CO₂</div>
+      </div>
+      <div class="hero-card">
+        <div class="hero-card-icon" style="background:rgba(0,245,255,0.1)">🚢</div>
+        <div class="hero-card-text">
+          <div class="hero-card-name">Coffee from Brazil</div>
+          <div class="hero-card-detail">Sea freight · 11,200 km to Mumbai</div>
+        </div>
+        <div class="hero-card-co2" style="color:#00ff88;text-shadow:0 0 12px rgba(0,255,136,0.5)">0.90 kg CO₂</div>
+      </div>
+      <div class="hero-card">
+        <div class="hero-card-icon" style="background:rgba(74,124,89,0.15)">🚛</div>
+        <div class="hero-card-text">
+          <div class="hero-card-name">Rice from India</div>
+          <div class="hero-card-detail">Road · 580 km to Mumbai</div>
+        </div>
+        <div class="hero-card-co2" style="color:#7fb89a">0.06 kg CO₂</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CALCULATOR -->
+<section class="app-section" id="calculator">
+  <div class="app-inner">
+    <div class="section-header">
+      <div>
+        <h2 class="section-title">Your Meal Calculator</h2>
+        <p class="section-sub">Add ingredients, choose your city, see the impact</p>
+      </div>
+    </div>
+
+    <div class="app-layout">
+      <!-- SIDEBAR -->
+      <div class="sidebar">
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">
+              <span class="card-title-icon">📍</span>
+              Your destination
+            </span>
+          </div>
+          <div class="card-body">
+            <div class="search-wrap">
+              <input class="search-input" id="cityInput" type="text" placeholder="Search for a city..." autocomplete="off">
+              <span class="search-icon">🔍</span>
+              <div class="search-dropdown" id="cityDropdown"></div>
+            </div>
+            <div class="selected-dest" id="selectedDest">
+              <div class="dest-pin">📍</div>
+              <div>
+                <div class="dest-name" id="destName">Mumbai, India</div>
+                <div class="dest-coords" id="destCoords">19.076°N, 72.877°E</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">
+              <span class="card-title-icon">🥗</span>
+              Ingredients
+            </span>
+            <span style="font-size:12px;color:var(--text-muted)" id="ingCount">0 items</span>
+          </div>
+          <div class="card-body" style="padding-bottom:16px">
+            <div class="ing-list" id="ingList"></div>
+            <button class="add-ing-btn" onclick="addIngredient()" style="margin-top:10px">
+              <span style="font-size:18px;line-height:1">+</span> Add ingredient
+            </button>
+            <button class="calc-btn" onclick="recalcAll()">
+              ⚡ Calculate footprint
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT COLUMN -->
+      <div class="right-col">
+        <div class="summary-grid">
+          <div class="summary-card sc-distance">
+            <span class="sc-icon">🛣️</span>
+            <div class="sc-val" id="totDist">0</div>
+            <div class="sc-unit">kilometres</div>
+            <div class="sc-label">Total distance</div>
+          </div>
+          <div class="summary-card sc-co2">
+            <span class="sc-icon">💨</span>
+            <div class="sc-val" id="totCO2">0.00</div>
+            <div class="sc-unit">kg CO₂ equivalent</div>
+            <div class="sc-label">Carbon emissions</div>
+          </div>
+          <div class="summary-card sc-count">
+            <span class="sc-icon">🌾</span>
+            <div class="sc-val" id="totIng">0</div>
+            <div class="sc-unit">ingredients tracked</div>
+            <div class="sc-label">Meal composition</div>
+          </div>
+        </div>
+
+        <div class="map-card">
+          <div class="map-header">
+            <span class="map-title">🗺️ Transportation routes</span>
+            <div class="map-legend">
+              <div class="legend-item"><div class="legend-line" style="background:#ff00aa;box-shadow:0 0 6px #ff00aa;border-top:2px dashed #ff00aa;height:2px"></div>Air</div>
+              <div class="legend-item"><div class="legend-line" style="background:#00f5ff;box-shadow:0 0 6px #00f5ff"></div>Sea</div>
+              <div class="legend-item"><div class="legend-line" style="background:#00ff88;box-shadow:0 0 6px #00ff88"></div>Road</div>
+              <div class="legend-item"><div class="legend-line" style="background:#bf00ff;box-shadow:0 0 6px #bf00ff"></div>Rail</div>
+            </div>
+          </div>
+          <div id="map"></div>
+        </div>
+
+        <div class="impact-card">
+          <div class="impact-title">
+            Carbon impact meter
+            <span class="impact-val" id="impactLabel">0.00 kg CO₂</span>
+          </div>
+          <div class="impact-track">
+            <div class="impact-fill" id="impactFill" style="width:0%;background:var(--sage)"></div>
+          </div>
+          <div class="impact-scale">
+            <span>🌿 Low</span>
+            <span>⚡ Moderate</span>
+            <span>🔥 High</span>
+          </div>
+          <div class="breakdown-title">CO₂ by transport mode</div>
+          <div class="breakdown-bars" id="breakdownBars">
+            <div style="font-size:13px;color:var(--text-muted);text-align:center;padding:12px">Add ingredients to see breakdown</div>
+          </div>
+        </div>
+
+        <div class="alt-card" id="altCard" style="display:none">
+          <div class="alt-header">Greener alternatives</div>
+          <div class="alt-sub">Swap these air-freighted items for local options and dramatically cut your carbon footprint.</div>
+          <div class="alt-list" id="altList"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section class="faq-section" id="faq">
+  <div class="faq-inner">
+    <div class="section-header" style="margin-bottom:40px">
+      <div>
+        <h2 class="section-title">Frequently Asked Questions</h2>
+        <p class="section-sub">Everything you need to know about food miles &amp; carbon tracking</p>
+      </div>
+    </div>
+
+    <div class="faq-chips">
+      <button class="faq-chip active" onclick="openFaq(0, this)">🌍 What are food miles?</button>
+      <button class="faq-chip" onclick="openFaq(1, this)">⚙️ How does it work?</button>
+      <button class="faq-chip" onclick="openFaq(2, this)">📐 What formula is used?</button>
+      <button class="faq-chip" onclick="openFaq(3, this)">🔥 Impact of high CO₂?</button>
+    </div>
+
+    <div class="faq-list">
+
+      <div class="faq-item open" data-index="0">
+        <button class="faq-q" onclick="toggleFaq(this)">
+          <span class="faq-q-icon">🌍</span>
+          <span>What are food miles?</span>
+          <span class="faq-chevron">▾</span>
+        </button>
+        <div class="faq-a">
+          <p>
+            <strong>Food miles</strong> refer to the distance food travels from where it is grown or produced to where it is finally consumed. The concept was coined by Professor Tim Lang in the 1990s to highlight the hidden environmental costs embedded in our food system.
+          </p>
+          <p>
+            Every time you eat an avocado flown in from Mexico, a kiwi shipped from New Zealand, or salmon airlifted from Norway, those kilometres carry a carbon cost. The longer and more emissions-intensive the journey, the larger the environmental footprint of that ingredient.
+          </p>
+          <div class="faq-fact-row">
+            <div class="faq-fact">
+              <div class="faq-fact-val" style="color:var(--neon-pink)">✈️ Air</div>
+              <div class="faq-fact-desc">0.602 kg CO₂ per tonne·km — highest impact</div>
+            </div>
+            <div class="faq-fact">
+              <div class="faq-fact-val" style="color:var(--neon-green)">🚛 Road</div>
+              <div class="faq-fact-desc">0.096 kg CO₂ per tonne·km — moderate impact</div>
+            </div>
+            <div class="faq-fact">
+              <div class="faq-fact-val" style="color:var(--neon-cyan)">🚢 Sea</div>
+              <div class="faq-fact-desc">0.008 kg CO₂ per tonne·km — lowest impact</div>
+            </div>
+            <div class="faq-fact">
+              <div class="faq-fact-val" style="color:#bf80ff">🚆 Rail</div>
+              <div class="faq-fact-desc">0.028 kg CO₂ per tonne·km — very low impact</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="faq-item" data-index="1">
+        <button class="faq-q" onclick="toggleFaq(this)">
+          <span class="faq-q-icon">⚙️</span>
+          <span>How does the calculator work?</span>
+          <span class="faq-chevron">▾</span>
+        </button>
+        <div class="faq-a">
+          <p>The FoodMiles calculator estimates the carbon footprint of each ingredient using three inputs: the <strong>origin of the food</strong>, your <strong>destination city</strong>, and the <strong>transport mode</strong> used to ship it.</p>
+          <ol class="faq-steps">
+            <li>
+              <span class="faq-step-num">01</span>
+              <div><strong>Select your city</strong> — Search from 500+ cities worldwide. This sets the destination coordinates for distance calculations.</div>
+            </li>
+            <li>
+              <span class="faq-step-num">02</span>
+              <div><strong>Add ingredients</strong> — Choose from 33+ pre-loaded foods, each with a known production origin (lat/lng) sourced from major growing regions.</div>
+            </li>
+            <li>
+              <span class="faq-step-num">03</span>
+              <div><strong>Set weight &amp; transport</strong> — Enter how many kilograms you're using and select the transport mode. Each food has a smart default mode based on how it is typically shipped globally.</div>
+            </li>
+            <li>
+              <span class="faq-step-num">04</span>
+              <div><strong>See your impact</strong> — The calculator instantly computes distance, total CO₂ emissions, and renders colour-coded routes on an interactive world map.</div>
+            </li>
+          </ol>
+        </div>
+      </div>
+
+      <div class="faq-item" data-index="2">
+        <button class="faq-q" onclick="toggleFaq(this)">
+          <span class="faq-q-icon">📐</span>
+          <span>What formula is used in the calculation?</span>
+          <span class="faq-chevron">▾</span>
+        </button>
+        <div class="faq-a">
+          <p>Two formulas power every result in this calculator:</p>
+          <div class="faq-formula-block">
+            <div class="faq-formula-label">1 — Haversine Formula (great-circle distance)</div>
+            <div class="faq-formula-code">
+              a = sin²(Δlat/2) + cos(lat₁) × cos(lat₂) × sin²(Δlng/2)<br>
+              distance = 2R × atan2(√a, √(1−a))<br>
+              <span style="color:var(--text-muted);font-size:11px">where R = 6,371 km (Earth's mean radius)</span>
+            </div>
+            <p style="margin-top:10px;font-size:13px">This calculates the shortest path between two points on Earth's curved surface — the true great-circle distance, as the crow (or cargo plane) flies.</p>
+          </div>
+          <div class="faq-formula-block">
+            <div class="faq-formula-label">2 — Emissions Formula (DEFRA methodology)</div>
+            <div class="faq-formula-code">
+              CO₂ (kg) = distance (km) × weight (kg) ÷ 1000 × carbon factor<br>
+              <span style="color:var(--text-muted);font-size:11px">Carbon factors sourced from DEFRA (UK Dept. for Environment, Food &amp; Rural Affairs)</span>
+            </div>
+            <p style="margin-top:10px;font-size:13px">Weight is divided by 1,000 to convert kg → tonnes, since carbon factors are expressed per <em>tonne</em>-kilometre. This is standard practice used by logistics companies and governments worldwide.</p>
+          </div>
+          <div class="faq-formula-block" style="border-color:rgba(0,255,136,0.25);background:rgba(0,255,136,0.04)">
+            <div class="faq-formula-label" style="color:var(--neon-green)">Example — Avocado from Mexico to Mumbai</div>
+            <div class="faq-formula-code" style="color:var(--neon-green)">
+              Weight: 0.3 kg · Mode: Air freight · Distance: ~13,500 km<br>
+              CO₂ = 13,500 × (0.3 ÷ 1,000) × 0.602 = <strong>2.44 kg CO₂</strong>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="faq-item" data-index="3">
+        <button class="faq-q" onclick="toggleFaq(this)">
+          <span class="faq-q-icon">🔥</span>
+          <span>What is the environmental impact of high CO₂ emissions?</span>
+          <span class="faq-chevron">▾</span>
+        </button>
+        <div class="faq-a">
+          <p>
+            CO₂ and other greenhouse gases trap heat in the Earth's atmosphere, driving <strong>global warming and climate change</strong>. Food transport contributes to this, and understanding your meal's footprint helps you make smarter choices.
+          </p>
+          <div class="faq-impact-grid">
+            <div class="faq-impact-card" style="border-color:rgba(0,255,136,0.25);background:rgba(0,255,136,0.04)">
+              <div class="faq-impact-icon">🌿</div>
+              <div class="faq-impact-level" style="color:var(--neon-green)">Low — under 1 kg CO₂</div>
+              <div class="faq-impact-desc">Comparable to charging a smartphone ~100 times. Typical for locally grown staples — rice, lentils, or coconuts from India.</div>
+            </div>
+            <div class="faq-impact-card" style="border-color:rgba(255,238,0,0.25);background:rgba(255,238,0,0.04)">
+              <div class="faq-impact-icon">⚡</div>
+              <div class="faq-impact-level" style="color:var(--neon-yellow)">Moderate — 1–5 kg CO₂</div>
+              <div class="faq-impact-desc">Equivalent to a 20–40 km car trip. Common with road-freighted produce from neighbouring regions or mixed transport chains.</div>
+            </div>
+            <div class="faq-impact-card" style="border-color:rgba(255,0,170,0.25);background:rgba(255,0,170,0.04)">
+              <div class="faq-impact-icon">🔥</div>
+              <div class="faq-impact-level" style="color:var(--neon-pink)">High — above 5 kg CO₂</div>
+              <div class="faq-impact-desc">Equivalent to driving 50+ km in a petrol car. Almost entirely driven by air freight — e.g. salmon from Norway or blueberries from the USA.</div>
+            </div>
+          </div>
+          <p style="margin-top:16px;font-size:13px">
+            The <strong>single biggest lever</strong>: avoid air-freighted food. Air transport emits up to <em>75× more CO₂</em> per tonne-km than sea freight. The <em>Greener Alternatives</em> panel in the calculator shows you exactly which ingredient swaps cut your footprint the most.
+          </p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer id="about">
+  <div class="footer-logo">FoodMiles</div>
+  <p class="footer-text">CO₂ factors sourced from DEFRA &amp; industry transport emissions data. Distances calculated using the Haversine formula.<br>Built to help consumers make more sustainable food choices.</p>
+</footer>
+
+<script src="app.js"></script>
+</body>
+</html>
