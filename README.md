@@ -1,44 +1,69 @@
-# 🌍 FoodMiles Calculator
+Track Your Plate’s Carbon Journey
 
-> Track the carbon footprint of your food — from farm to fork.
+EcoMiles is a sustainability-focused web application that helps users calculate the carbon footprint of food based on food miles — the distance food travels from its origin to your plate.
 
-![Banner](./screenshots/banner.png)
+It empowers users to make smarter food choices by visualizing transport emissions, suggesting eco-friendly local alternatives, and gamifying sustainable eating habits.
 
----
+🚀 Problem Statement
 
-## 🚀 Overview
+Most people do not realize that the food they consume daily may travel thousands of kilometers before reaching them.
 
-**FoodMiles Calculator** is an interactive web application that helps users understand the environmental impact of their food choices.
+For example:
 
-It calculates:
+Avocado from Mexico → Mumbai ✈️
+Coffee from Brazil → India 🚢
+Blueberries from USA → India ✈️
 
-* 🌍 Distance traveled by ingredients
-* 💨 Carbon emissions (CO₂)
-* 🚛 Impact of transport methods
-* 🌱 Greener alternatives
+This transportation creates a significant carbon footprint, contributing to climate change.
 
----
+EcoMiles solves this by helping users:
+
+Understand food miles
+Calculate transport emissions
+Compare transport modes
+Discover local sustainable alternatives
+
 
 ## ✨ Features
 
-* 🗺️ **Interactive Map (Leaflet.js)**
-  Visualize food transportation routes globally
+🥗 Food Carbon Calculator
 
-* 📦 **Ingredient-Based Tracking**
-  Add multiple ingredients and analyze each
+Calculate CO₂ emissions for food items based on:
+Food origin country
+Destination city
+Transport mode (Air / Sea / Rail / Road)
+Distance traveled using Haversine Formula
 
-* 📊 **Real-time CO₂ Calculation**
-  Based on distance and transport mode
+🗺️ Interactive Route Map
 
-* 📍 **City Search System**
-  Choose your destination dynamically
+Visual route visualization using:
+Leaflet.js
+Live route plotting
+Origin → Destination tracking
+📊 Smart Analytics Dashboard
 
-* ⚡ **Impact Meter**
-  Understand how sustainable your meal is
+Built using Chart.js:
 
-* 🌱 **Smart Alternatives**
-  Suggests eco-friendly local swaps
+Carbon comparison charts
+Weekly footprint summary
+Meal history tracking
+Eco score visualization
 
+🏆 Gamification System
+
+Includes:
+Carbon grades (A → E)
+Eco badges
+Sustainability score
+Smart recommendations
+
+📚 Educational Learning Section
+
+Users learn:
+What are food miles?
+Why transport emissions matter
+Difference between Air vs Sea shipping
+Local alternatives for imported foods
 ---
 
 ## 🧠 How It Works
@@ -48,8 +73,9 @@ It calculates:
 3. Choose transport type & weight
 4. App calculates:
 
-   * Distance (using Haversine formula)
-   * CO₂ emissions
+   * Distance (using Haversine formula): a = sin²(Δlat/2) + cos(lat₁)·cos(lat₂)·sin²(Δlng/2)
+                                         d = 2R · atan2(√a, √(1−a))
+   * CO₂ emissions: CO2​ = Distance × EmissionFactor
 5. Results shown on:
 
    * Map
@@ -60,53 +86,16 @@ It calculates:
 
 ## 🛠️ Tech Stack
 
-* **HTML5**
-* **CSS3 (Advanced UI with variables & animations)**
-* **JavaScript (Vanilla JS)**
-* **Leaflet.js (Maps)**
-
----
-
-## 📸 Screenshots
-
-### 🏠 Home Page
-
-![Home](./screenshots/home.png)
-
-### 🧮 Calculator Interface
-
-![Calculator](./screenshots/calculator.png)
-
-### 🗺️ Map Visualization
-
-![Map](./screenshots/map.png)
-
-### 📊 Impact Analysis
-
-![Impact](./screenshots/impact.png)
-
----
-
-## 📂 Project Structure
-
-```
-FoodMilesCalculator/
-│── index.html
-│── styles.css
-│── app.js
-│── README.md
-│── screenshots/
-│    ├── home.png
-│    ├── calculator.png
-│    ├── map.png
-│    └── impact.png
-```
+* **HTML5
+* **CSS
+* **JavaScript 
+* **Leaflet.js 
 
 ---
 
 ## 🌐 Live Demo
 
-👉 https://yaashp.github.io/FOODMILESCALCULATOR/
+👉 https://yaashp.github.io/ECOROUTES/
 
 ---
 
@@ -127,26 +116,10 @@ open index.html
 
 ---
 
-## 🎯 Future Improvements
-
-* 📊 Add charts (Chart.js)
-* 🌍 Real-time API for distance
-* 🔐 User login & saved meals
-* 📱 Better mobile optimization
-* 🧠 AI-based food suggestions
-
----
-
 ## 🤝 Contributing
 
 Pull requests are welcome!
 For major changes, open an issue first.
-
----
-
-## 📜 License
-
-This project is open-source and available under the MIT License.
 
 ---
 
@@ -164,6 +137,6 @@ If you like this project:
 
 👉 Star this repo
 👉 Share it
-👉 Use it in your hackathon 🚀
+
 
 ---
